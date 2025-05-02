@@ -8,7 +8,7 @@
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "lint": "biome lint",
-    "start": "prisma migrate deploy && remix-serve ./build/server/index.js",
+    "start": "prisma generate && prisma migrate deploy && remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "makemigration": "prisma migrate dev --name $1",
     "migrate": "prisma migrate deploy"
