@@ -17,6 +17,7 @@ export function LoadingButton({ onClick, isLoading, done }: Props) {
 			<div
 				className={clsx("i-lucide-arrow-down", {
 					"i-svg-spinners-270-ring": isLoading,
+					"i-lucide-check": done,
 				})}
 			/>{" "}
 			{isLoading ? "Loading..." : done ? "fin" : "Load more"}

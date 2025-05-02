@@ -8,7 +8,7 @@
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "lint": "biome lint",
-    "start": "remix-serve ./build/server/index.js",
+    "start": "prisma migrate deploy && remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "makemigration": "prisma migrate dev --name $1",
     "migrate": "prisma migrate deploy"
@@ -31,7 +31,8 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.56.1",
     "recharts": "^2.15.3",
-    "unocss": "^66.1.0-beta.12"
+    "unocss": "^66.1.0-beta.12",
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

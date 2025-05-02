@@ -29,7 +29,7 @@ model RequestLog {
   status    Int
   method    String
   path      String
-  duration  Int
+  duration  Int?
   sessionId String?
   meta      Json?
   timestamp DateTime

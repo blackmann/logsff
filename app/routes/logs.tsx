@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { z } from "zod";
 import { prisma } from "~/lib/prisma.server";
-import { unauthorized } from "~/lib/responses";
+import { badRequest, internalServerError, unauthorized } from "~/lib/responses";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const url = new URL(request.url);
@@ -41,24 +42,72 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	const token = request.headers.get("Authorization");
 
 	if (token !== process.env.APP_TOKEN) {
-		throw unauthorized();
+		throw unauthorized({ detail: "Missing Authorization" });
 	}
 
 	const { type, ...data } = formData;
 
-	switch (type) {
-		case "request":
-			await prisma.requestLog.create({
-				data,
-			});
-			break;
+	try {
+		switch (type) {
+			case "request": {
+				const parsed = requestLogSchema.parse(data);
+				await prisma.requestLog.create({
+					data: {
+						...parsed,
+						timestamp: new Date(parsed.timestamp),
+					},
+				});
+				break;
+			}
 
-		case "app":
-			await prisma.appLog.create({
-				data,
+			case "app": {
+				const parsed = appLogSchema.parse(data);
+				await prisma.appLog.create({
+					data: {
+						...parsed,
+						timestamp: new Date(parsed.timestamp),
+					},
+				});
+				break;
+			}
+
+			default:
+				throw badRequest({ detail: "Invalid log type" });
+		}
+	} catch (error) {
+		if (error instanceof z.ZodError) {
+			throw badRequest({
+				detail: error.errors.map((e) => ({
+					field: e.path.join("."),
+					message: e.message,
+				})),
 			});
-			break;
+		}
+
+		console.error(error);
+		throw internalServerError({ detail: "Invalid log data" });
 	}
 
 	return { success: true };
 };
+
+const requestLogSchema = z.object({
+	appId: z.string(),
+	method: z.string(),
+	path: z.string(),
+	status: z.number(),
+	timestamp: z.date().or(z.number()),
+	duration: z.number().optional(),
+	sessionId: z.string().optional(),
+	meta: z.record(z.any()).optional(),
+});
+
+const appLogSchema = z.object({
+	appId: z.string(),
+	level: z.enum(["info", "error", "warn"]),
+	message: z.string(),
+	timestamp: z.date().or(z.number()),
+	duration: z.number().optional(),
+	sessionId: z.string().optional(),
+	meta: z.record(z.any()).optional(),
+});

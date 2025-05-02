@@ -22,4 +22,9 @@ function unauthorized(data: Data = null) {
 	return json(data, { status: 401 });
 }
 
-export { badRequest, forbidden, methodNotAllowed, notFound, unauthorized };
+function internalServerError(data: Data = null) {
+	return json(data, { status: 500 });
+}
+
+export { badRequest, forbidden, internalServerError, methodNotAllowed, notFound, unauthorized };
+
