@@ -1,0 +1,51 @@
+{
+  "name": "gremix",
+  "private": true,
+  "sideEffects": false,
+  "version": "0.0",
+  "type": "module",
+  "scripts": {
+    "build": "remix vite:build",
+    "dev": "remix vite:dev",
+    "lint": "biome lint",
+    "start": "remix-serve ./build/server/index.js",
+    "typecheck": "tsc",
+    "makemigration": "prisma migrate dev --name $1",
+    "migrate": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@floating-ui/react": "^0.27.8",
+    "@iconify-json/lucide": "^1.2.39",
+    "@iconify-json/svg-spinners": "^1.2.2",
+    "@julr/unocss-preset-forms": "^1.0.0",
+    "@prisma/client": "6.7.0",
+    "@remix-run/node": "^2.16.2",
+    "@remix-run/react": "^2.16.2",
+    "@remix-run/serve": "^2.16.2",
+    "@unocss/reset": "66.1.0-beta.12",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "isbot": "^5.1.27",
+    "prisma": "^6.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.56.1",
+    "recharts": "^2.15.3",
+    "unocss": "^66.1.0-beta.12"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@remix-run/dev": "^2.16.2",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.4.1",
+    "react-router-dom": "^6.26.0",
+    "type-fest": "^4.22.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.4",
+    "vite-tsconfig-paths": "^5.1.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
