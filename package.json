@@ -5,7 +5,7 @@
   "version": "0.0",
   "type": "module",
   "scripts": {
-    "build": "remix vite:build",
+    "build": "prisma generate && remix vite:build",
     "dev": "remix vite:dev",
     "lint": "biome lint",
     "start": "prisma generate && prisma migrate deploy && remix-serve ./build/server/index.js",
