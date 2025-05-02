@@ -4,7 +4,7 @@ This is a simple to use, simple to deploy observability for backend applications
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fblackmann%2Flogsff&env=DATABASE_URL,COOKIE_SECRET,APP_TOKEN&envDescription=See%20link%20for%20details%20on%20env%20variables&envLink=https%3A%2F%2Fgithub.com%2Fblackmann%2Flogff%3Ftab%3Dreadme-ov-file%23env-variables)
 
-# Development
+## Development
 
 Project uses `yarn`. Run `yarn install` afer cloning the project. You'll need a postgres database either locally installed or from some online provider.
 
@@ -22,7 +22,7 @@ For a live version of your app, you can use [Neon](https://neon.tech) database.
 
 ## Usage
 
-To recor a log, make a POST request to `/logs` with the following format:
+To record a log, make a POST request to `/logs` with the following format:
 
 ```ts
 type Log = {
@@ -52,3 +52,20 @@ type Log = {
 
 `meta` is an optional field that can be used to add any additional data to the log.
 
+## Client
+
+There's a ready-to-use client implemented at [/logsff-client.ts](/logsff-client.ts) that you can copy and paste into your Typescript project. However, you can implement your own client in any language or format you want. You can use the `logsff-client.ts` as a reference implementation.
+
+```ts
+import { send } from "./logsff-client";
+
+send({
+  type: "request",
+  appId: "my-app",
+  method: "GET",
+  path: "/",
+  status: 200,
+  timestamp: Date.now(),
+  duration: 100,
+});
+```
