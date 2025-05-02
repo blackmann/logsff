@@ -10,7 +10,7 @@
     "lint": "biome lint",
     "start": "prisma generate && prisma migrate deploy && remix-serve ./build/server/index.js",
     "typecheck": "tsc",
-    "vercel-build": "prisma generate && prisma migrate deploy && remix build",
+    "vercel-build": "prisma generate && prisma migrate deploy && remix vite:build",
     "makemigration": "prisma migrate dev --name $1",
     "migrate": "prisma migrate deploy"
   },
