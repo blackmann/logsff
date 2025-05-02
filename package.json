@@ -5,11 +5,12 @@
   "version": "0.0",
   "type": "module",
   "scripts": {
-    "build": "prisma generate && remix vite:build",
+    "build": "remix vite:build",
     "dev": "remix vite:dev",
     "lint": "biome lint",
     "start": "prisma generate && prisma migrate deploy && remix-serve ./build/server/index.js",
     "typecheck": "tsc",
+    "vercel-build": "prisma generate && prisma migrate deploy && remix build",
     "makemigration": "prisma migrate dev --name $1",
     "migrate": "prisma migrate deploy"
   },
