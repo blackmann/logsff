@@ -7,12 +7,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const url = new URL(request.url);
 	const type = url.searchParams.get("type");
 	const lastTime = Number(url.searchParams.get("timestamp__lt"));
+	const appId = url.searchParams.get("appId");
+
+	if (!appId) {
+		throw badRequest({ detail: "Missing appId" });
+	}
 
 	switch (type) {
 		case "request": {
 			const logs = await prisma.requestLog.findMany({
 				where: {
 					timestamp: { lt: new Date(lastTime) },
+					appId: appId,
 				},
 				orderBy: { timestamp: "desc" },
 				take: 100,
@@ -25,6 +31,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 			const logs = await prisma.appLog.findMany({
 				where: {
 					timestamp: { lt: new Date(lastTime) },
+					appId: appId,
 				},
 				orderBy: { timestamp: "desc" },
 				take: 100,
@@ -72,7 +79,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			}
 
 			default:
-				throw badRequest({ detail: "Invalid log type" });
+				return badRequest({ detail: "Invalid log type" });
 		}
 	} catch (error) {
 		if (error instanceof z.ZodError) {

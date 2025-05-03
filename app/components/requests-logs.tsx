@@ -1,21 +1,33 @@
 import type { RequestLog } from "@prisma/client";
+import { useParams } from "@remix-run/react";
 import { format } from "date-fns";
+import React from "react";
 import { usePaginatedResults } from "~/lib/use-paginated-results";
 import { LoadingButton } from "./loading-button";
 
-async function fetchRequestLogs(prevResults: RequestLog[][]) {
+async function fetchRequestLogs(appId: string, prevResults: RequestLog[][]) {
 	const lastTimestamp = prevResults.at(-1)?.at(-1)?.timestamp;
 	const lastTime = lastTimestamp
 		? new Date(lastTimestamp).getTime()
 		: Date.now();
-	const res = await fetch(`/logs?type=request&timestamp__lt=${lastTime}`);
+
+	const res = await fetch(
+		`/logs?type=request&timestamp__lt=${lastTime}&appId=${appId}`,
+	);
 	const { logs } = await res.json();
 
 	return logs as RequestLog[];
 }
 
 export function RequestLogsTable() {
-	const { results, next, isLoading } = usePaginatedResults(fetchRequestLogs);
+	const { app } = useParams();
+
+	const fn = React.useCallback(
+		(prevResults: RequestLog[][]) => fetchRequestLogs(app!, prevResults),
+		[app],
+	);
+
+	const { results, next, isLoading } = usePaginatedResults(fn);
 
 	const flattened = results.flat();
 	const done = results.at(-1)?.length === 0;
@@ -35,6 +47,9 @@ export function RequestLogsTable() {
 								</th>
 								<th className="text-sm text-secondary text-start font-normal px-2 py-1">
 									Path
+								</th>
+								<th className="text-sm text-secondary text-start font-normal px-2 py-1 w-24">
+									Session ID
 								</th>
 								<th className="text-sm text-secondary text-start font-normal px-2 py-1 w-24">
 									Status
@@ -65,6 +80,10 @@ export function RequestLogsTable() {
 											{it.method}
 										</td>
 										<td className=".text-sm font-mono px-2 py-1">{it.path}</td>
+
+										<td className=".text-sm font-mono px-2 py-1">
+											<span className="text-secondary">{it.sessionId}</span>
+										</td>
 										<td className=".text-sm font-mono px-2 py-1">
 											<span className="text-secondary">{it.status}</span>
 										</td>

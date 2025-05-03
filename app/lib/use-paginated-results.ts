@@ -9,6 +9,11 @@ export function usePaginatedResults<T>(
 	const previousResults = React.useRef<T[][]>([]);
 	const isLoadingRef = React.useRef(false);
 
+	React.useEffect(() => {
+		previousResults.current = [];
+		setResults([]);
+	}, [fn]);
+
 	const loadMore = React.useCallback(
 		async (prevResults: T[][]) => {
 			if (isLoadingRef.current) return;
@@ -26,7 +31,7 @@ export function usePaginatedResults<T>(
 			});
 
 			setIsLoading(false);
-      isLoadingRef.current = false
+			isLoadingRef.current = false;
 		},
 		[fn],
 	);

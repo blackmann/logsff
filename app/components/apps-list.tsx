@@ -1,4 +1,5 @@
-import { Link, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
+import clsx from "clsx";
 import React from "react";
 import type { loader } from "~/routes/app";
 import { AddApp } from "./add-app";
@@ -12,6 +13,8 @@ import {
 export function AppsList() {
 	const { apps, user } = useLoaderData<typeof loader>();
 
+	const {pathname} = useLocation()
+
 	return (
 		<nav className="pt-2 h-0 flex-1 flex flex-col">
 			<header className="text-sm px-2 text-secondary flex justify-between items-center">
@@ -23,7 +26,14 @@ export function AppsList() {
 			<ul className="p-2 flex-1">
 				{apps.map((app) => (
 					<li key={app.slug}>
-						<div className="group flex gap-2 items-center rounded-lg hover:bg-zinc-100 dark:hover:bg-neutral-800">
+						<div
+							className={clsx(
+								"group flex gap-2 items-center rounded-lg hover:bg-zinc-100 dark:hover:bg-neutral-800",
+								{
+									"bg-zinc-200 dark:bg-neutral-800": pathname.includes(`/app/${app.slug}`),
+								},
+							)}
+						>
 							<Link
 								to={`/app/${app.slug}/requests`}
 								className="flex-1 flex gap-2 items-center p-2"

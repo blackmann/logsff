@@ -1,20 +1,31 @@
 import type { AppLog } from "@prisma/client";
+import { useParams } from "@remix-run/react";
+import React from "react";
 import { usePaginatedResults } from "~/lib/use-paginated-results";
 import { LoadingButton } from "./loading-button";
 
-async function fetchAppLogs(prevResults: AppLog[][]) {
+async function fetchAppLogs(appId: string, prevResults: AppLog[][]) {
 	const lastTimestamp = prevResults.at(-1)?.at(-1)?.timestamp;
 	const lastTime = lastTimestamp
 		? new Date(lastTimestamp).getTime()
 		: Date.now();
-	const res = await fetch(`/logs?type=app&timestamp__lt=${lastTime}`);
+	const res = await fetch(
+		`/logs?type=app&timestamp__lt=${lastTime}&appId=${appId}`,
+	);
 	const { logs } = await res.json();
 
 	return logs as AppLog[];
 }
 
 export function AppLogsTable() {
-	const { results, next, isLoading } = usePaginatedResults(fetchAppLogs);
+	const { app } = useParams();
+
+	const fn = React.useCallback(
+		(prevResults: AppLog[][]) => fetchAppLogs(app!, prevResults),
+		[app],
+	);
+
+	const { results, next, isLoading } = usePaginatedResults(fn);
 
 	const flattened = results.flat();
 	const done = results.at(-1)?.length === 0;
