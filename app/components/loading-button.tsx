@@ -20,7 +20,7 @@ export function LoadingButton({ onClick, isLoading, done }: Props) {
 					"i-lucide-check": done,
 				})}
 			/>{" "}
-			{isLoading ? "Loading..." : done ? "fin" : "Load more"}
+			{isLoading ? "Loading…" : done ? "fin" : "Load more"}
 		</Button>
 	);
 }

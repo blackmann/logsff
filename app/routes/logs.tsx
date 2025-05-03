@@ -1,9 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { z } from "zod";
+import { checkAuth } from "~/lib/check-auth";
 import { prisma } from "~/lib/prisma.server";
 import { badRequest, internalServerError, unauthorized } from "~/lib/responses";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+	await checkAuth(request);
+
 	const url = new URL(request.url);
 	const type = url.searchParams.get("type");
 	const lastTime = Number(url.searchParams.get("timestamp__lt"));
@@ -22,6 +25,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 				},
 				orderBy: { timestamp: "desc" },
 				take: 100,
+				omit: { meta: true },
 			});
 
 			return { logs };
@@ -35,6 +39,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 				},
 				orderBy: { timestamp: "desc" },
 				take: 100,
+				omit: { meta: true },
 			});
 
 			return { logs };

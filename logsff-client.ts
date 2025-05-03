@@ -31,10 +31,19 @@ type AppLog = {
 
 type Log = RequestLog | AppLog;
 
-async function send(log: Log) {
-	const res = await fetch(process.env.LOGSFF_URL!, {
+async function send(log: Exclude<Log, "appId">) {
+	if (
+		!process.env.LOGSFF_URL ||
+		!process.env.LOGSFF_TOKEN ||
+		!process.env.LOGSFF_APP_ID
+	) {
+		console.warn("Logsff is not configured");
+		return;
+	}
+
+	const res = await fetch(process.env.LOGSFF_URL, {
 		method: "POST",
-		body: JSON.stringify(log),
+		body: JSON.stringify({ ...log, appId: process.env.LOGSFF_APP_ID }),
 		headers: {
 			"Content-Type": "application/json",
 			Authorization: process.env.LOGSFF_TOKEN!,
