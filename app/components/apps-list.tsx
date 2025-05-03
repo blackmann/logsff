@@ -10,22 +10,22 @@ import {
 } from "./popover";
 
 export function AppsList() {
-	const { apps } = useLoaderData<typeof loader>();
+	const { apps, user } = useLoaderData<typeof loader>();
 
 	return (
-		<nav className="py-2">
+		<nav className="pt-2 h-0 flex-1 flex flex-col">
 			<header className="text-sm px-2 text-secondary flex justify-between items-center">
 				<div>Apps ({apps.length})</div>
 				<div>
 					<AddApp />
 				</div>
 			</header>
-			<ul className="p-2">
+			<ul className="p-2 flex-1">
 				{apps.map((app) => (
 					<li key={app.slug}>
 						<div className="group flex gap-2 items-center rounded-lg hover:bg-zinc-100 dark:hover:bg-neutral-800">
 							<Link
-								to={`/app/${app.slug}/logs`}
+								to={`/app/${app.slug}/requests`}
 								className="flex-1 flex gap-2 items-center p-2"
 							>
 								<div className="i-lucide-box text-secondary" />{" "}
@@ -39,6 +39,13 @@ export function AppsList() {
 					</li>
 				))}
 			</ul>
+
+			<div className="bg-zinc-100 dark:bg-neutral-800 flex justify-between p-2 text-secondary">
+				<div className="font-mono">@{user.username}</div>
+				<div>
+					<div className="i-lucide-command" />
+				</div>
+			</div>
 		</nav>
 	);
 }

@@ -1,10 +1,18 @@
-import type { MetaFunction } from "@remix-run/node";
-import { prisma } from "~/lib/prisma.server";
+import {
+	type LoaderFunctionArgs,
+	type MetaFunction,
+	redirect,
+} from "@remix-run/node";
+import { checkAuth } from "~/lib/check-auth";
 
-export const loader = async () => {
-	const apps = await prisma.app.findMany();
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+	try {
+		await checkAuth(request);
+	} catch (error) {
+		return redirect("/login");
+	}
 
-	return { apps };
+	return redirect("/app");
 };
 
 export const meta: MetaFunction = () => {

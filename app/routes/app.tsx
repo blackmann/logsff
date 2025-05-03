@@ -1,13 +1,19 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Outlet } from "@remix-run/react";
+import { Outlet, redirect } from "@remix-run/react";
 import { AppsList } from "~/components/apps-list";
 import { NavHeader } from "~/components/nav-header";
+import { checkAuth } from "~/lib/check-auth";
 import { prisma } from "~/lib/prisma.server";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-	const apps = await prisma.app.findMany();
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+	try {
+		const user = await checkAuth(request);
+		const apps = await prisma.app.findMany();
 
-	return { apps };
+		return { apps, user };
+	} catch (error) {
+		return redirect("/login");
+	}
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -20,7 +26,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function AppLayout() {
 	return (
 		<div className="grid grid-cols-5 h-screen">
-			<div className="col-span-1 h-full border-e bg-zinc-50 dark:(bg-neutral-900 border-neutral-700)">
+			<div className="col-span-1 h-screen border-e bg-zinc-50 dark:(bg-neutral-900 border-neutral-700) flex flex-col">
 				<NavHeader />
 				<AppsList />
 			</div>
