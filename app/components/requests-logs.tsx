@@ -106,7 +106,7 @@ export function RequestLogsTable() {
 											</span>
 										</td>
 										<td className="font-mono px-2 py-1">{it.method}</td>
-										<td className="font-mono px-2 py-1">{it.path}</td>
+										<td className="font-mono px-2 py-1 break-all">{it.path}</td>
 
 										{!selectedLog && (
 											<td className="font-mono px-2 py-1">
@@ -178,20 +178,29 @@ function LogDetails({
 				</div>
 
 				<div className="px-2 text-base flex gap-2">
-					<div className="flex-1">
+					<div className="flex-1 flex gap-2">
 						<span className="font-mono text-secondary ms-2">{log.method}</span>{" "}
-						<span className="font-mono">{log.path}</span>
+						<span className="font-mono flex-1 whitespace-pre-wrap break-all">
+							{log.path}
+						</span>
 					</div>
 
-					<div className="flex-1 text-end">
+					<div className="text-end">
 						<span className="font-mono text-secondary">{log.status}</span>
 					</div>
 				</div>
 			</header>
 
-			<div className="my-2">{log.sessionId}</div>
+			{log.sessionId && (
+				<div className="my-2 px-4">
+					<span className="text-secondary text-sm">Session ID:</span>{" "}
+					<span className="font-mono">{log.sessionId}</span>
+				</div>
+			)}
 
-			{loaded?.meta !== undefined && <MetaTable meta={loaded.meta} />}
+			{loaded?.meta !== undefined && fetcher.state !== "loading" && (
+				<MetaTable meta={loaded.meta} />
+			)}
 		</div>
 	);
 }
