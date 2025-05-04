@@ -74,7 +74,10 @@ export function AppLogsTable() {
 								<tr
 									className={clsx(
 										"hover:bg-zinc-100 dark:hover:bg-neutral-800 cursor-pointer",
-										{ "bg-zinc-100 dark:bg-neutral-800": it.id === selectedLog?.id },
+										{
+											"bg-zinc-100 dark:bg-neutral-800":
+												it.id === selectedLog?.id,
+										},
 									)}
 									key={it.id}
 									onClick={() => select(it)}
@@ -164,9 +167,16 @@ function LogDetails({ log, onClose }: { log: AppLog; onClose: () => void }) {
 				</div>
 			</header>
 
-			<div className="my-2">{log.sessionId}</div>
+			{log.sessionId && (
+				<div className="my-2 px-4">
+					<span className="text-secondary text-sm">Session ID:</span>{" "}
+					<span className="font-mono">{log.sessionId}</span>
+				</div>
+			)}
 
-			{loaded?.meta !== undefined && <MetaTable meta={loaded.meta} />}
+			{loaded?.meta !== undefined && fetcher.state !== "loading" && (
+				<MetaTable meta={loaded.meta} />
+			)}
 		</div>
 	);
 }
