@@ -1,6 +1,8 @@
 import { useLoaderData } from "@remix-run/react";
 import clsx from "clsx";
 import type { loader } from "~/routes/app.$app.requests";
+import { Tooltip } from "react-tooltip";
+import { formatHour } from "~/lib/date";
 
 export function RequestsSum() {
 	const { summary } = useLoaderData<typeof loader>();
@@ -63,16 +65,28 @@ export function RequestsSum() {
 }
 
 function WorkTime() {
+	const { workTimeData } = useLoaderData<typeof loader>();
+	const hourlyActivity = Array(24).fill(false);
+
+	for (const [index, entry] of workTimeData.entries()) {
+		if (entry.count > 0) {
+			hourlyActivity[index] = true;
+		}
+	}
+
 	return (
 		<div className="p-2">
-			<div className="text-sm text-secondary">Work time</div>
-			<div className="flex gap-.5">
+			<div className="text-sm text-secondary">Work time (last 24h)</div>
+			<div className="flex gap-0.5">
 				{Array.from({ length: 24 }).map((_, i) => (
 					<div
-						key={i}
-						className={clsx("w-2 h-6 bg-green-500 rounded", {
-							"bg-neutral-300 dark:bg-neutral-700": [4, 8, 9, 19].includes(i),
+						key={workTimeData[i]?.timestamp}
+						className={clsx("w-2 h-6 rounded", {
+							"bg-green-500": hourlyActivity[i],
+							"bg-neutral-300 dark:bg-neutral-700": !hourlyActivity[i],
 						})}
+						data-tooltip-id="worktime-tooltip"
+						data-tooltip-content={`${formatHour(i, workTimeData)} | ${hourlyActivity[i] ? "Active" : "Inactive"}`}
 					/>
 				))}
 			</div>
@@ -80,6 +94,7 @@ function WorkTime() {
 			<p className="text-xs text-secondary leading-none mt-2">
 				This measures if the server made at least one request in each hour.
 			</p>
+			<Tooltip id="worktime-tooltip" place="top" className="tooltipWrapper" />
 		</div>
 	);
 }

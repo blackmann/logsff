@@ -8,6 +8,7 @@ import {
 	getQueryOpts,
 	getRequestsTimeseries,
 } from "~/lib/get-requests-timeseries";
+import { getWorkTimeData } from "~/lib/get-worktime-data";
 import { prisma } from "~/lib/prisma.server";
 import { notFound } from "~/lib/responses";
 
@@ -31,7 +32,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 	const timeseries = await getRequestsTimeseries({
 		slug: app.slug,
-		...opts
+		...opts,
 	});
 
 	const summary = await getRequestsSummary({
@@ -39,7 +40,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 		...opts,
 	});
 
-	return { app, timeseries, summary };
+	const workTimeData = await getWorkTimeData(app.slug);
+
+	return { app, timeseries, summary, workTimeData };
 };
 
 export const meta: MetaFunction = () => {
