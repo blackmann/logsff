@@ -49,7 +49,7 @@ export function AppLogsTable() {
 					<table className="w-full">
 						<thead className="sticky top-0 bg-zinc-50 dark:(bg-neutral-900 border-neutral-700)">
 							<tr className="border-b dark:border-neutral-800">
-								<th className="text-sm text-secondary text-start font-normal px-2 py-1 w-40">
+								<th className="text-sm text-secondary text-start font-normal px-2 py-1 w-46">
 									Time
 								</th>
 								<th className="text-sm text-secondary text-start font-normal px-2 py-1 w-24">
