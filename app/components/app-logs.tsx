@@ -1,7 +1,7 @@
 import type { AppLog } from "@prisma/client";
 import { useFetcher, useParams } from "@remix-run/react";
 import clsx from "clsx";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
 import React from "react";
 import { usePaginatedResults } from "~/lib/use-paginated-results";
 import { LoadingButton } from "./loading-button";
@@ -70,40 +70,50 @@ export function AppLogsTable() {
 						</thead>
 
 						<tbody>
-							{flattened.map((it) => (
-								<tr
-									className={clsx(
-										"hover:bg-zinc-100 dark:hover:bg-neutral-800 cursor-pointer",
-										{
-											"bg-zinc-100 dark:bg-neutral-800":
-												it.id === selectedLog?.id,
-										},
-									)}
-									key={it.id}
-									onClick={() => select(it)}
-									onKeyDown={(e) => {
-										if (e.key === "Enter") {
-											select(it);
-										}
-									}}
-									tabIndex={0}
-								>
-									<td className="text-sm font-mono px-2 py-1">
-										May 1 09:25.<span className="text-secondary">00</span>
-									</td>
-									<td className=".text-sm font-mono px-2 py-1">{it.level}</td>
-									<td className=".text-sm font-mono px-2 py-1">{it.message}</td>
-									{!selectedLog && (
-										<td className=".text-sm font-mono px-2 py-1">
-											{it.sessionId}
+							{flattened.map((it) => {
+								const timestamp = new Date(it.timestamp);
+								const formatted = format(timestamp, "MMM d HH:mm.ss");
+
+								return (
+									<tr
+										className={clsx(
+											"hover:bg-zinc-100 dark:hover:bg-neutral-800 cursor-pointer",
+											{
+												"bg-zinc-100 dark:bg-neutral-800":
+													it.id === selectedLog?.id,
+											},
+										)}
+										key={it.id}
+										onClick={() => select(it)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter") {
+												select(it);
+											}
+										}}
+										tabIndex={0}
+									>
+										<td className="text-sm font-mono px-2 py-1">
+											{formatted}.
+											<span className="text-secondary">
+												{timestamp.getMilliseconds()}
+											</span>
 										</td>
-									)}
-									<td className=".text-sm font-mono px-2 py-1 text-end">
-										{it.duration}
-										<span className="text-secondary">ms</span>
-									</td>
-								</tr>
-							))}
+										<td className=".text-sm font-mono px-2 py-1">{it.level}</td>
+										<td className=".text-sm font-mono px-2 py-1">
+											{it.message}
+										</td>
+										{!selectedLog && (
+											<td className=".text-sm font-mono px-2 py-1">
+												{it.sessionId}
+											</td>
+										)}
+										<td className=".text-sm font-mono px-2 py-1 text-end">
+											{it.duration}
+											<span className="text-secondary">ms</span>
+										</td>
+									</tr>
+								);
+							})}
 						</tbody>
 					</table>
 
