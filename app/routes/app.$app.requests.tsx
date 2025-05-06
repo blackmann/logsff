@@ -1,4 +1,7 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { startOfDay } from "date-fns";
+import React from "react";
+import { useSearchParams } from "@remix-run/react";
 import { Filter } from "~/components/filter";
 import { RequestsGraph } from "~/components/requests-graph";
 import { RequestLogsTable } from "~/components/requests-logs";
@@ -8,9 +11,10 @@ import {
 	getQueryOpts,
 	getRequestsTimeseries,
 } from "~/lib/get-requests-timeseries";
-import { getWorkTimeData } from "~/lib/get-worktime-data";
+import { getRequestWorkTime } from "~/lib/get-requests-worktime";
 import { prisma } from "~/lib/prisma.server";
 import { notFound } from "~/lib/responses";
+import type { FilterForm } from "~/lib/request-filter";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const app = await prisma.app.findUnique({
@@ -40,9 +44,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 		...opts,
 	});
 
-	const workTimeData = await getWorkTimeData(app.slug);
+	const worktime = await getRequestWorkTime(app.slug);
 
-	return { app, timeseries, summary, workTimeData };
+	return { app, timeseries, summary, worktime, opts };
 };
 
 export const meta: MetaFunction = () => {
@@ -54,12 +58,36 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Requests() {
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	const filters = React.useMemo<FilterForm>(
+		() => ({
+			query: searchParams.get("query") || "",
+			timeRange: (searchParams.get("period") as "45d" | "48h") || "45d",
+			maxDate: searchParams.get("start")
+				? new Date(searchParams.get("start")!)
+				: startOfDay(new Date(Date.now() - 45 * 24 * 60 * 60 * 1000)),
+		}),
+		[searchParams],
+	);
+
+	const handleFilterChange = React.useCallback(
+		(updated: FilterForm) => {
+			setSearchParams({
+				query: updated.query,
+				period: updated.timeRange,
+				start: updated.maxDate.toISOString().split("T")[0],
+			});
+		},
+		[setSearchParams],
+	);
+
 	return (
 		<>
 			<RequestsSum />
 			<RequestsGraph />
-			<Filter />
-			<RequestLogsTable />
+			<Filter onFilterChange={handleFilterChange} />
+			<RequestLogsTable filters={filters} />
 		</>
 	);
 }

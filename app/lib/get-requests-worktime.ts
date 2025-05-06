@@ -1,6 +1,6 @@
 import { prisma } from "./prisma.server";
 
-export async function getWorkTimeData(slug: string) {
+export async function getRequestWorkTime(slug: string) {
 	const now = new Date();
 	const past23Hours = new Date(now);
 	past23Hours.setHours(now.getHours() - 23);

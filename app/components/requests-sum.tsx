@@ -3,13 +3,16 @@ import clsx from "clsx";
 import type { loader } from "~/routes/app.$app.requests";
 import { Tooltip } from "react-tooltip";
 import { formatHour } from "~/lib/date";
+import { format } from "date-fns";
+import { calculateRequestMetrics } from "~/lib/requests-summary";
 
 export function RequestsSum() {
-	const { summary } = useLoaderData<typeof loader>();
+	const { summary, opts } = useLoaderData<typeof loader>();
 
-	const errorRate = (summary.errors / summary.total || 0) * 100;
+	const metrics = calculateRequestMetrics(summary);
+
 	return (
-		<div className=".bg-zinc-50 dark:(bg-neutral-900 border-neutral-700) grid grid-cols-6 divide-x dark:divide-neutral-700 border-b dark:border-neutral-700">
+		<div className="bg-zinc-50 dark:(bg-neutral-900 border-neutral-700) grid grid-cols-6 divide-x dark:divide-neutral-700 border-b dark:border-neutral-700">
 			<div className="col-span-1">
 				<div className="p-3">
 					<div className="flex">
@@ -19,28 +22,33 @@ export function RequestsSum() {
 					</div>
 					<div className="font-mono ps-2">
 						{summary.total.toLocaleString()}{" "}
-						<span className="text-sm text-green-500 inline-flex items-center">
-							<div className="i-lucide-arrow-up" />
-							21%
-						</span>
+						{metrics.percentageChange !== 0 && (
+							<span
+								className={`text-sm ${metrics.changeColor} inline-flex items-center`}
+							>
+								<div className={metrics.changeIcon} />
+								{Math.abs(metrics.percentageChange).toFixed(1)}%
+							</span>
+						)}
 					</div>
 
 					<div className="text-sm text-secondary px-2">
-						Avg 7req/min in the past hour
+						Avg {metrics.avgRequestsPerMinute.toFixed(1)} req/min in the past
+						hour
 					</div>
 				</div>
 			</div>
 			<div className="col-span-1">
 				<div className="p-3">
 					<div className="flex">
-						<div className=".text-sm text-orange-500 bg-orange-200/30 dark:bg-orange-600/10 rounded-lg px-2">
+						<div className="text-sm text-orange-500 bg-orange-200/30 dark:bg-orange-600/10 rounded-lg px-2">
 							Error Rate
 						</div>
 					</div>
-					<p className=" font-mono px-2">{errorRate.toFixed(1)}%</p>
+					<p className="font-mono px-2">{metrics.errorRate.toFixed(1)}%</p>
 					<div className="text-sm text-secondary px-2">
 						{summary.errors.toLocaleString()} non ok responses during this
-						period.
+						period
 					</div>
 				</div>
 			</div>
@@ -55,9 +63,13 @@ export function RequestsSum() {
 				<div className="p-2">
 					<div className="text-sm text-secondary">Showing logs from</div>
 					<div className="font-mono text-sm">
-						1 Mar <span className="text-secondary">to</span> 31 Mar 2025
+						{format(new Date(opts.startDate), "d MMM")}{" "}
+						<span className="text-secondary">to</span>{" "}
+						{format(new Date(opts.endDate), "d MMM, yyyy")}
 					</div>
-					<div className="text-sm text-secondary">45d</div>
+					<div className="text-sm text-secondary">
+						{metrics.formattedPeriod}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -65,10 +77,10 @@ export function RequestsSum() {
 }
 
 function WorkTime() {
-	const { workTimeData } = useLoaderData<typeof loader>();
+	const { worktime } = useLoaderData<typeof loader>();
 	const hourlyActivity = Array(24).fill(false);
 
-	for (const [index, entry] of workTimeData.entries()) {
+	for (const [index, entry] of worktime.entries()) {
 		if (entry.count > 0) {
 			hourlyActivity[index] = true;
 		}
@@ -80,13 +92,13 @@ function WorkTime() {
 			<div className="flex gap-0.5">
 				{Array.from({ length: 24 }).map((_, i) => (
 					<div
-						key={workTimeData[i]?.timestamp}
+						key={worktime[i]?.timestamp}
 						className={clsx("w-2 h-6 rounded", {
 							"bg-green-500": hourlyActivity[i],
 							"bg-neutral-300 dark:bg-neutral-700": !hourlyActivity[i],
 						})}
 						data-tooltip-id="worktime-tooltip"
-						data-tooltip-content={`${formatHour(i, workTimeData)} | ${hourlyActivity[i] ? "Active" : "Inactive"}`}
+						data-tooltip-content={formatHour(i, worktime)}
 					/>
 				))}
 			</div>

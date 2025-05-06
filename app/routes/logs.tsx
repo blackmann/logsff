@@ -11,17 +11,44 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const type = url.searchParams.get("type");
 	const lastTime = Number(url.searchParams.get("timestamp__lt"));
 	const appId = url.searchParams.get("appId");
+	const query = url.searchParams.get("query") || "";
+	const timeRange = url.searchParams.get("timeRange") || "45d";
+	const maxDate = url.searchParams.get("maxDate")
+		? new Date(url.searchParams.get("maxDate") || "")
+		: new Date();
 
 	if (!appId) {
 		throw badRequest({ detail: "Missing appId" });
 	}
 
+	// Calculate timestamp_gte based on timeRange
+	let timestampGte: Date;
+	if (timeRange === "48h") {
+		timestampGte = new Date(Date.now() - 48 * 60 * 60 * 1000);
+	} else {
+		// Default to 45 days
+		timestampGte = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000);
+	}
+
+	// Ensure maxDate is respected
+	timestampGte = maxDate < timestampGte ? maxDate : timestampGte;
+
 	switch (type) {
 		case "request": {
 			const logs = await prisma.requestLog.findMany({
 				where: {
-					timestamp: { lt: new Date(lastTime) },
-					appId: appId,
+					timestamp: {
+						lt: new Date(lastTime),
+						gte: timestampGte,
+					},
+					appId,
+					...(query && {
+						OR: [
+							{ method: { contains: query, mode: "insensitive" } },
+							{ path: { contains: query, mode: "insensitive" } },
+							{ sessionId: { contains: query, mode: "insensitive" } },
+						],
+					}),
 				},
 				orderBy: { timestamp: "desc" },
 				take: 100,
@@ -34,8 +61,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		case "app": {
 			const logs = await prisma.appLog.findMany({
 				where: {
-					timestamp: { lt: new Date(lastTime) },
-					appId: appId,
+					timestamp: {
+						lt: new Date(lastTime),
+						gte: timestampGte,
+					},
+					appId,
+					...(query && {
+						message: { contains: query, mode: "insensitive" },
+					}),
 				},
 				orderBy: { timestamp: "desc" },
 				take: 100,

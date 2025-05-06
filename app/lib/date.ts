@@ -1,8 +1,8 @@
 const formatHour = (
 	index: number,
-	workTimeData: { timestamp: string; count: number }[],
+	worktime: { timestamp: string; count: number }[],
 ) => {
-	const timestamp = new Date(workTimeData[index].timestamp);
+	const timestamp = new Date(worktime[index].timestamp);
 	const hour = timestamp.getHours();
 
 	const timeRange = `${hour.toString().padStart(2, "0")}:00 - ${(hour === 23 ? 0 : hour + 1).toString().padStart(2, "0")}:00`;
