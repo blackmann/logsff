@@ -1,5 +1,20 @@
-import { type ActionFunctionArgs, redirect } from "@remix-run/node";
+import {
+	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
+	redirect,
+} from "@remix-run/node";
 import { prisma } from "~/lib/prisma.server";
+
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+	const url = new URL(request.url);
+	const path = url.pathname.replace(/\/$/, "");
+
+	if (path === `/app/${params.app}`) {
+		return redirect("/app");
+	}
+
+	return null;
+};
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
 	if (request.method === "DELETE") {
@@ -9,5 +24,5 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 		return redirect("/app");
 	}
 
-  return null
+	return null;
 };
