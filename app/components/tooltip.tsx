@@ -69,7 +69,7 @@ export function Tooltip({
 						<FloatingArrow
 							ref={arrowRef}
 							context={context}
-							className="fill-neutral-800"
+							className="dark:fill-neutral-800  fill-neutral-200"
 						/>
 					</div>
 				</FloatingPortal>

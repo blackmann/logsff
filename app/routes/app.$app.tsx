@@ -10,7 +10,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const path = url.pathname.replace(/\/$/, "");
 
 	if (path === `/app/${params.app}`) {
-		return redirect("/app");
+		return redirect(`/app/${params.app}/requests`);
 	}
 
 	return null;

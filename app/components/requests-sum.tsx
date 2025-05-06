@@ -102,7 +102,7 @@ function WorkTime() {
 						placement="top"
 					>
 						<div
-							className={clsx("w-2 h-6 rounded", {
+							className={clsx("w-2 cursor-pointer h-6 rounded", {
 								"bg-green-500": hourlyActivity[i],
 								"bg-neutral-300 dark:bg-neutral-700": !hourlyActivity[i],
 							})}
@@ -131,7 +131,7 @@ export function _Tip(
 			<div
 				className={clsx("w-2 h-2 rounded-full", {
 					"bg-green-500": isActive,
-					"bg-gray-400": !isActive,
+					"bg-neutral-300 dark:bg-neutral-700": !isActive,
 				})}
 			/>
 			<span className="text-sm font-mono">{label}</span>
