@@ -1,15 +1,16 @@
 import { useLoaderData } from "@remix-run/react";
 import clsx from "clsx";
 import type { loader } from "~/routes/app.$app.requests";
-import { Tooltip } from "react-tooltip";
 import { formatHour } from "~/lib/date";
 import { format } from "date-fns";
 import { calculateRequestMetrics } from "~/lib/requests-summary";
+import { Tooltip } from "./tooltip";
 
 export function RequestsSum() {
 	const { summary, opts } = useLoaderData<typeof loader>();
 
 	const metrics = calculateRequestMetrics(summary);
+	const isIncrease = metrics.percentageChange >= 0;
 
 	return (
 		<div className="bg-zinc-50 dark:(bg-neutral-900 border-neutral-700) grid grid-cols-6 divide-x dark:divide-neutral-700 border-b dark:border-neutral-700">
@@ -24,9 +25,13 @@ export function RequestsSum() {
 						{summary.total.toLocaleString()}{" "}
 						{metrics.percentageChange !== 0 && (
 							<span
-								className={`text-sm ${metrics.changeColor} inline-flex items-center`}
+								className={`text-sm ${isIncrease ? "text-green-500" : "text-red-500"} inline-flex items-center`}
 							>
-								<div className={metrics.changeIcon} />
+								<div
+									className={
+										isIncrease ? "i-lucide-arrow-up" : "i-lucide-arrow-down"
+									}
+								/>
 								{Math.abs(metrics.percentageChange).toFixed(1)}%
 							</span>
 						)}
@@ -89,24 +94,47 @@ function WorkTime() {
 	return (
 		<div className="p-2">
 			<div className="text-sm text-secondary">Work time (last 24h)</div>
-			<div className="flex gap-0.5">
+			<div className="flex gap-[2px]">
 				{Array.from({ length: 24 }).map((_, i) => (
-					<div
-						key={worktime[i]?.timestamp}
-						className={clsx("w-2 h-6 rounded", {
-							"bg-green-500": hourlyActivity[i],
-							"bg-neutral-300 dark:bg-neutral-700": !hourlyActivity[i],
-						})}
-						data-tooltip-id="worktime-tooltip"
-						data-tooltip-content={formatHour(i, worktime)}
-					/>
+					<Tooltip
+						key={worktime[i]?.timestamp || i}
+						content={_Tip(i, worktime, hourlyActivity)}
+						placement="top"
+					>
+						<div
+							className={clsx("w-2 h-6 rounded", {
+								"bg-green-500": hourlyActivity[i],
+								"bg-neutral-300 dark:bg-neutral-700": !hourlyActivity[i],
+							})}
+						/>
+					</Tooltip>
 				))}
 			</div>
 
 			<p className="text-xs text-secondary leading-none mt-2">
 				This measures if the server made at least one request in each hour.
 			</p>
-			<Tooltip id="worktime-tooltip" place="top" className="tooltipWrapper" />
+		</div>
+	);
+}
+
+export function _Tip(
+	i: number,
+	worktime: { timestamp: string; count: number }[],
+	hourlyActivity: boolean[],
+) {
+	const isActive = hourlyActivity[i];
+	const label = formatHour(i, worktime);
+
+	return (
+		<div className="flex items-center gap-2">
+			<div
+				className={clsx("w-2 h-2 rounded-full", {
+					"bg-green-500": isActive,
+					"bg-gray-400": !isActive,
+				})}
+			/>
+			<span className="text-sm font-mono">{label}</span>
 		</div>
 	);
 }

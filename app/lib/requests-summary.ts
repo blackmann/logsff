@@ -11,12 +11,8 @@ interface RequestMetrics {
 	errorRate: number;
 	formattedPeriod: string;
 	percentageChange: number;
-	isIncrease: boolean;
-	changeIcon: string;
-	changeColor: string;
 	avgRequestsPerMinute: number;
 }
-
 function calculateRequestMetrics(summary: RequestSummary): RequestMetrics {
 	const errorRate = (summary.errors / summary.total || 0) * 100;
 
@@ -29,19 +25,12 @@ function calculateRequestMetrics(summary: RequestSummary): RequestMetrics {
 			? ((summary.total - summary.previousTotal) / summary.previousTotal) * 100
 			: 0;
 
-	const isIncrease = percentageChange >= 0;
-	const changeIcon = isIncrease ? "i-lucide-arrow-up" : "i-lucide-arrow-down";
-	const changeColor = isIncrease ? "text-green-500" : "text-red-500";
-
 	const avgRequestsPerMinute = summary.lastHourTotal / 60;
 
 	return {
 		errorRate,
 		formattedPeriod,
 		percentageChange,
-		isIncrease,
-		changeIcon,
-		changeColor,
 		avgRequestsPerMinute,
 	};
 }

@@ -29,12 +29,12 @@ export function NavHeader() {
 					className={clsx(
 						"flex text-sm font-mono border rounded-lg divide-x dark:(border-neutral-700 divide-neutral-700) overflow-hidden",
 						{
-							"!border-blue-500/70": isLogs && appCount > 0 && appId,
-							"!border-rose-500/70": isRequests && appCount > 0 && appId,
+							"!border-blue-500/70": isLogs && appId,
+							"!border-rose-500/70": isRequests && appId,
 						},
 					)}
 				>
-					{appCount > 0 && appId ? (
+					{appId ? (
 						<>
 							<Link
 								className={clsx("bg-zinc-100 dark:bg-neutral-800 px-2 py-1", {
