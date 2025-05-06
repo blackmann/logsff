@@ -8,8 +8,11 @@ export function NavHeader() {
 	const params = useParams();
 	const appId = params.app;
 
-	const isRequests = pathname.includes("/requests");
-	const isLogs = pathname.includes("/logs");
+	const segments = pathname.split("/").filter(Boolean);
+	const lastSegment = segments[segments.length - 1];
+
+	const isRequests = lastSegment === "requests";
+	const isLogs = lastSegment === "logs";
 
 	return (
 		<header className="p-2 border-b dark:border-neutral-700">
