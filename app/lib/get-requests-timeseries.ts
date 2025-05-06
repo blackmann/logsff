@@ -1,4 +1,4 @@
-import { endOfDay, startOfDay, subDays, subHours } from "date-fns";
+import { endOfDay, startOfDay, addDays, addHours } from "date-fns";
 import { prisma } from "./prisma.server";
 
 export interface Opts {
@@ -89,21 +89,20 @@ interface OptsOpts {
 }
 
 export function getQueryOpts({ startDate, period }: OptsOpts) {
-	const now = new Date();
-
 	if (period === "45d") {
-		// For 45d view, let's start 45 days ago from now if startDate is undefined
+		const baseStartDate =
+			startDate ?? new Date(Date.now() - 45 * 24 * 60 * 60 * 1000);
 		return {
-			startDate: startDate ?? new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
-			endDate: endOfDay(now),
+			startDate: startOfDay(baseStartDate),
+			endDate: endOfDay(addDays(baseStartDate, 45)),
 			period: "45d" as const,
 		};
 	}
 
-	// For 48h view, let's start 48 hours ago from now
+	const baseStartDate = startDate ?? new Date(Date.now() - 48 * 60 * 60 * 1000);
 	return {
-		startDate: subHours(now, 48),
-		endDate: now,
+		startDate: startOfDay(baseStartDate),
+		endDate: addHours(baseStartDate, 48),
 		period: "48h" as const,
 	};
 }

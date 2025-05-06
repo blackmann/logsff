@@ -27,9 +27,9 @@ async function fetchLogs<T extends "request" | "app">({
 		type,
 		timestamp__lt: lastTime.toString(),
 		appId,
-		...(filters.query && { query: filters.query }),
+		...(filters.query ? { query: filters.query } : {}),
 		timeRange: filters.timeRange,
-		maxDate: filters.maxDate.toISOString(),
+		...(filters.maxDate ? { maxDate: filters.maxDate.toISOString() } : {}),
 	});
 
 	const res = await fetch(`/logs?${params}`);

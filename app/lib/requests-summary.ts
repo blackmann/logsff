@@ -22,7 +22,7 @@ function calculateRequestMetrics(summary: RequestSummary): RequestMetrics {
 
 	const hours = summary.periodDuration / (1000 * 60 * 60);
 	const formattedPeriod =
-		hours > 48 ? `${Math.floor(hours / 24)}d` : `${Math.floor(hours)}h`;
+		hours <= 48 ? `${Math.floor(hours)}h` : `${Math.floor(hours / 24)}d`;
 
 	const percentageChange =
 		summary.previousTotal > 0

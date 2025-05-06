@@ -66,18 +66,21 @@ export default function Requests() {
 			timeRange: (searchParams.get("period") as "45d" | "48h") || "45d",
 			maxDate: searchParams.get("start")
 				? new Date(searchParams.get("start")!)
-				: startOfDay(new Date(Date.now() - 45 * 24 * 60 * 60 * 1000)),
+				: undefined,
 		}),
 		[searchParams],
 	);
 
 	const handleFilterChange = React.useCallback(
 		(updated: FilterForm) => {
-			setSearchParams({
+			const params: Record<string, string> = {
 				query: updated.query,
 				period: updated.timeRange,
-				start: updated.maxDate.toISOString().split("T")[0],
-			});
+			};
+			if (updated.maxDate) {
+				params.start = updated.maxDate.toISOString().split("T")[0];
+			}
+			setSearchParams(params);
 		},
 		[setSearchParams],
 	);
@@ -86,7 +89,7 @@ export default function Requests() {
 		<>
 			<RequestsSum />
 			<RequestsGraph />
-			<Filter onFilterChange={handleFilterChange} />
+			<Filter onFilterChange={handleFilterChange} searchParams={searchParams} />
 			<RequestLogsTable filters={filters} />
 		</>
 	);

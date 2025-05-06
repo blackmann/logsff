@@ -17,7 +17,7 @@ export function AppsSum() {
 				<div className="p-3">
 					<div className="flex">
 						<div className="text-blue-500 bg-blue-50 dark:bg-blue-600/10 rounded-lg px-2">
-							Total Requests
+							Total Logs
 						</div>
 					</div>
 					<div className="font-mono ps-2">
@@ -48,7 +48,7 @@ export function AppsSum() {
 					<p className="font-mono px-2">{metrics.errorRate.toFixed(1)}%</p>
 					<div className="text-sm text-secondary px-2">
 						{summary.errors.toLocaleString()} non ok responses during this
-						period
+						period.
 					</div>
 				</div>
 			</div>
@@ -89,7 +89,7 @@ function WorkTime() {
 	return (
 		<div className="p-2">
 			<div className="text-sm text-secondary">Work time (last 24h)</div>
-			<div className="flex gap-0.5">
+			<div className="flex gap-.5">
 				{Array.from({ length: 24 }).map((_, i) => (
 					<div
 						key={worktime[i]?.timestamp}

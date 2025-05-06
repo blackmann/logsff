@@ -21,16 +21,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		throw badRequest({ detail: "Missing appId" });
 	}
 
-	// Calculate timestamp_gte based on timeRange
 	let timestampGte: Date;
 	if (timeRange === "48h") {
 		timestampGte = new Date(Date.now() - 48 * 60 * 60 * 1000);
 	} else {
-		// Default to 45 days
 		timestampGte = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000);
 	}
 
-	// Ensure maxDate is respected
 	timestampGte = maxDate < timestampGte ? maxDate : timestampGte;
 
 	switch (type) {
