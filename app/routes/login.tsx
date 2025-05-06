@@ -9,14 +9,23 @@ import argon2 from "argon2";
 import { useForm } from "react-hook-form";
 import { Button } from "~/components/button";
 import { Input } from "~/components/input";
-import { authCookie } from "~/lib/cookies.server";
+import { checkAuth } from "~/lib/check-auth";
+import { authCookie, lastAppCookie } from "~/lib/cookies.server";
+import { getLastAppRedirect } from "~/lib/get-last-app";
 import { prisma } from "~/lib/prisma.server";
 import { badRequest } from "~/lib/responses";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const userCreated = await prisma.user.count();
+	try {
+		await checkAuth(request);
 
-	return { userCreated };
+		const { redirectTo } = await getLastAppRedirect(request);
+		return redirect(redirectTo);
+	} catch (_) {
+		const userCreated = await prisma.user.count();
+
+		return { userCreated };
+	}
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -52,7 +61,9 @@ export async function action({ request }: ActionFunctionArgs) {
 		return badRequest({ detail: "Incorrect username or password" });
 	}
 
-	return redirect("/", {
+	const { redirectTo } = await getLastAppRedirect(request);
+
+	return redirect(redirectTo, {
 		headers: {
 			"Set-Cookie": await authCookie.serialize({ userId: user.id }),
 		},

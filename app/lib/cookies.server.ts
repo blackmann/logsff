@@ -13,3 +13,9 @@ export const authCookie = createCookie("auth", {
 	maxAge: MAX_COOKIE_AGE,
 	secure: true,
 });
+
+export const lastAppCookie = createCookie("last-app", {
+	maxAge: MAX_COOKIE_AGE,
+	secure: true,
+	httpOnly: true,
+});

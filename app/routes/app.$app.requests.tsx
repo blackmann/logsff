@@ -1,7 +1,6 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { startOfDay } from "date-fns";
 import React from "react";
-import { useSearchParams } from "@remix-run/react";
+import { json, useSearchParams } from "@remix-run/react";
 import { Filter } from "~/components/filter";
 import { RequestsGraph } from "~/components/requests-graph";
 import { RequestLogsTable } from "~/components/requests-logs";
@@ -15,6 +14,8 @@ import { getRequestWorkTime } from "~/lib/get-requests-worktime";
 import { prisma } from "~/lib/prisma.server";
 import { notFound } from "~/lib/responses";
 import type { FilterForm } from "~/lib/request-filter";
+import { lastAppCookie } from "~/lib/cookies.server";
+import { getLastAppRedirect } from "~/lib/get-last-app";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const app = await prisma.app.findUnique({
@@ -23,6 +24,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 	if (!app) {
 		throw notFound();
+	}
+
+	const { lastApp } = await getLastAppRedirect(request);
+
+	let currentApp: string | undefined;
+	if (lastApp?.app !== params.app) {
+		currentApp = await lastAppCookie.serialize({ app: params.app });
 	}
 
 	const url = new URL(request.url);
@@ -46,7 +54,16 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 	const worktime = await getRequestWorkTime(app.slug);
 
-	return { app, timeseries, summary, worktime, opts };
+	return json(
+		{ app, timeseries, summary, worktime, opts },
+		currentApp
+			? {
+					headers: {
+						"Set-Cookie": currentApp,
+					},
+				}
+			: undefined,
+	);
 };
 
 export const meta: MetaFunction = () => {
