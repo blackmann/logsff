@@ -4,6 +4,7 @@ import {
 	redirect,
 } from "@remix-run/node";
 import { checkAuth } from "~/lib/check-auth";
+import { getLastAppRedirect } from "~/lib/get-last-app";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	try {
@@ -12,7 +13,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		return redirect("/login");
 	}
 
-	return redirect("/app");
+	const { redirectTo } = await getLastAppRedirect(request);
+
+	return redirect(redirectTo);
 };
 
 export const meta: MetaFunction = () => {

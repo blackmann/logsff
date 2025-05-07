@@ -1,4 +1,6 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import React from "react";
+import { json, useSearchParams } from "@remix-run/react";
 import { Filter } from "~/components/filter";
 import { RequestsGraph } from "~/components/requests-graph";
 import { RequestLogsTable } from "~/components/requests-logs";
@@ -8,8 +10,12 @@ import {
 	getQueryOpts,
 	getRequestsTimeseries,
 } from "~/lib/get-requests-timeseries";
+import { getRequestWorkTime } from "~/lib/get-requests-worktime";
 import { prisma } from "~/lib/prisma.server";
 import { notFound } from "~/lib/responses";
+import type { FilterForm } from "~/lib/request-filter";
+import { lastAppCookie } from "~/lib/cookies.server";
+import { getLastAppRedirect } from "~/lib/get-last-app";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const app = await prisma.app.findUnique({
@@ -18,6 +24,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 	if (!app) {
 		throw notFound();
+	}
+
+	const { lastApp } = await getLastAppRedirect(request);
+
+	let currentAppCookie: string | undefined;
+	if (lastApp?.app !== params.app) {
+		currentAppCookie = await lastAppCookie.serialize({ app: params.app });
 	}
 
 	const url = new URL(request.url);
@@ -31,7 +44,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 	const timeseries = await getRequestsTimeseries({
 		slug: app.slug,
-		...opts
+		...opts,
 	});
 
 	const summary = await getRequestsSummary({
@@ -39,7 +52,18 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 		...opts,
 	});
 
-	return { app, timeseries, summary };
+	const worktime = await getRequestWorkTime(app.slug);
+
+	return json(
+		{ app, timeseries, summary, worktime, opts },
+		currentAppCookie
+			? {
+					headers: {
+						"Set-Cookie": currentAppCookie,
+					},
+				}
+			: undefined,
+	);
 };
 
 export const meta: MetaFunction = () => {
@@ -51,12 +75,39 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Requests() {
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	const filters = React.useMemo<FilterForm>(
+		() => ({
+			query: searchParams.get("query") || "",
+			timeRange: (searchParams.get("period") as "45d" | "48h") || "45d",
+			maxDate: searchParams.get("start")
+				? new Date(searchParams.get("start")!)
+				: undefined,
+		}),
+		[searchParams],
+	);
+
+	const handleFilterChange = React.useCallback(
+		(updated: FilterForm) => {
+			const params: Record<string, string> = {
+				query: updated.query,
+				period: updated.timeRange,
+			};
+			if (updated.maxDate) {
+				params.start = updated.maxDate.toISOString().split("T")[0];
+			}
+			setSearchParams(params);
+		},
+		[setSearchParams],
+	);
+
 	return (
 		<>
 			<RequestsSum />
 			<RequestsGraph />
-			<Filter />
-			<RequestLogsTable />
+			<Filter onFilterChange={handleFilterChange} searchParams={searchParams} />
+			<RequestLogsTable filters={filters} />
 		</>
 	);
 }

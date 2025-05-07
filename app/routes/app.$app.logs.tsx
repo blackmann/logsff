@@ -1,4 +1,6 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { startOfDay } from "date-fns";
+import { useSearchParams } from "react-router-dom";
 import { AppGraph } from "~/components/app-graph";
 import { AppLogsTable } from "~/components/app-logs";
 import { AppsSum } from "~/components/apps-sum";
@@ -7,7 +9,10 @@ import { getAppSummary } from "~/lib/get-app-summary";
 import { getAppTimeseries } from "~/lib/get-app-timeseries";
 import { getQueryOpts } from "~/lib/get-requests-timeseries";
 import { prisma } from "~/lib/prisma.server";
+import type { FilterForm } from "~/lib/request-filter";
 import { notFound } from "~/lib/responses";
+import React from "react";
+import { getAppWorkTime } from "~/lib/get-app-worktime";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const app = await prisma.app.findUnique({
@@ -36,7 +41,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		...opts,
 	});
 
-	return { app, timeseries, summary };
+	const worktime = await getAppWorkTime(app.slug);
+
+	return { app, timeseries, summary, worktime, opts };
 };
 
 export const meta: MetaFunction = () => {
@@ -48,12 +55,39 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Logs() {
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	const filters = React.useMemo<FilterForm>(
+		() => ({
+			query: searchParams.get("query") || "",
+			timeRange: (searchParams.get("period") as "45d" | "48h") || "45d",
+			maxDate: searchParams.get("start")
+				? new Date(searchParams.get("start")!)
+				: undefined,
+		}),
+		[searchParams],
+	);
+
+	const handleFilterChange = React.useCallback(
+		(updated: FilterForm) => {
+			const params: Record<string, string> = {
+				query: updated.query,
+				period: updated.timeRange,
+			};
+			if (updated.maxDate) {
+				params.start = updated.maxDate.toISOString().split("T")[0];
+			}
+			setSearchParams(params);
+		},
+		[setSearchParams],
+	);
+
 	return (
 		<>
 			<AppsSum />
 			<AppGraph />
-			<Filter />
-			<AppLogsTable />
+			<Filter onFilterChange={handleFilterChange} searchParams={searchParams} />
+			<AppLogsTable filters={filters} />
 		</>
 	);
 }

@@ -59,6 +59,8 @@ function AddAppForm() {
 		});
 	}
 
+	const nameLength = watch("name").length;
+
 	React.useEffect(() => {
 		if (fetcher.data) {
 			popover.setOpen(false);
@@ -74,6 +76,7 @@ function AddAppForm() {
 					<Input
 						placeholder="App name"
 						{...register("name", { required: true })}
+						maxLength={28}
 					/>
 				</div>
 
@@ -82,13 +85,14 @@ function AddAppForm() {
 						placeholder={slugPlaceholder}
 						className="font-mono"
 						{...register("slug")}
+						maxLength={28}
 					/>
 					<div className="text-xs text-secondary">
 						This will be used to identify this app in API calls.
 					</div>
 				</div>
 
-				<div className="mt-4">
+				<div className="mt-4 flex justify-between items-center">
 					<Button type="submit" disabled={fetcher.state === "submitting"}>
 						<div
 							className={clsx("i-lucide-plus", {
@@ -97,6 +101,11 @@ function AddAppForm() {
 						/>
 						Create app
 					</Button>
+					<span
+						className={`text-xs ${nameLength === 28 ? "text-red-500" : "text-secondary"}`}
+					>
+						{nameLength}/28
+					</span>
 				</div>
 			</form>
 		</div>

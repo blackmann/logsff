@@ -5,3 +5,4 @@ app/generated/prisma
 /.cache
 /build
 .env
+k6

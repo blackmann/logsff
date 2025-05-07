@@ -6,9 +6,13 @@ export function NavHeader() {
 	const { pathname } = useLocation();
 
 	const params = useParams();
+	const appId = params.app;
 
-	const isRequests = pathname.includes("/requests");
-	const isLogs = pathname.includes("/logs");
+	const segments = pathname.split("/").filter(Boolean);
+	const lastSegment = segments[segments.length - 1];
+
+	const isRequests = lastSegment === "requests";
+	const isLogs = lastSegment === "logs";
 
 	return (
 		<header className="p-2 border-b dark:border-neutral-700">
@@ -20,32 +24,34 @@ export function NavHeader() {
 					logsff
 				</div>
 
-				<div
-					className={clsx(
-						"flex text-sm font-mono border rounded-lg divide-x dark:(border-neutral-700 divide-neutral-700) overflow-hidden",
-						{
-							"!border-blue-500/70": isLogs,
-							"!border-rose-500/70": isRequests,
-						},
-					)}
-				>
-					<Link
-						className={clsx("bg-zinc-100 dark:bg-neutral-800 px-2 py-1", {
-							"!bg-rose-500 text-white": isRequests,
-						})}
-						to={`/app/${params.app}/requests`}
+				{appId && (
+					<div
+						className={clsx(
+							"flex text-sm font-mono border rounded-lg divide-x dark:(border-neutral-700 divide-neutral-700) overflow-hidden",
+							{
+								"!border-blue-500/70": isLogs && appId,
+								"!border-rose-500/70": isRequests && appId,
+							},
+						)}
 					>
-						Requests
-					</Link>
-					<Link
-						className={clsx("bg-zinc-100 dark:bg-neutral-800 px-2 py-1", {
-							"!bg-blue-500 text-white": isLogs,
-						})}
-						to={`/app/${params.app}/logs`}
-					>
-						App Logs
-					</Link>
-				</div>
+						<Link
+							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-2 py-1", {
+								"!bg-rose-500 text-white": isRequests,
+							})}
+							to={`/app/${appId}/requests`}
+						>
+							Requests
+						</Link>
+						<Link
+							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-2 py-1", {
+								"!bg-blue-500 text-white": isLogs,
+							})}
+							to={`/app/${appId}/logs`}
+						>
+							App Logs
+						</Link>
+					</div>
+				)}
 			</div>
 		</header>
 	);

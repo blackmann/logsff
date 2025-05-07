@@ -4,25 +4,31 @@ import {
 	type MetaFunction,
 	redirect,
 } from "@remix-run/node";
-import { useLoaderData, useSubmit } from "@remix-run/react";
+import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import argon2 from "argon2";
 import { useForm } from "react-hook-form";
 import { Button } from "~/components/button";
 import { Input } from "~/components/input";
+import { checkAuth } from "~/lib/check-auth";
 import { authCookie } from "~/lib/cookies.server";
 import { prisma } from "~/lib/prisma.server";
 import { badRequest } from "~/lib/responses";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const userCreated = await prisma.user.count();
+	try {
+		await checkAuth(request);
 
-	return { userCreated };
+		return redirect("/");
+	} catch (_) {
+		const userCreated = await prisma.user.count();
+
+		return { userCreated };
+	}
 }
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.json();
-	const username = formData.username;
-	const password = formData.password;
+	const { username, password } = formData;
 
 	const userCreated = await prisma.user.count();
 	if (userCreated === 0) {
@@ -40,17 +46,17 @@ export async function action({ request }: ActionFunctionArgs) {
 			},
 		});
 	}
+
 	const user = await prisma.user.findUnique({
-		where: {
-			username,
-		},
+		where: { username },
 	});
 	if (!user) {
-		throw badRequest({ detail: "User not found" });
+		return badRequest({ detail: "User not found" });
 	}
+
 	const isPasswordValid = await argon2.verify(user.password, password);
 	if (!isPasswordValid) {
-		throw badRequest({ detail: "Incorrect password" });
+		return badRequest({ detail: "Incorrect username or password" });
 	}
 
 	return redirect("/", {
@@ -66,8 +72,11 @@ export const meta: MetaFunction = () => {
 
 export default function Login() {
 	const { userCreated } = useLoaderData<typeof loader>();
-	const { register, handleSubmit } = useForm();
+	const actionData = useActionData<typeof action>();
+	const { register, handleSubmit, watch, reset } = useForm();
 	const submit = useSubmit();
+
+	const $password = watch("password")?.length || 0;
 
 	function onSubmit(data: any) {
 		submit(JSON.stringify(data), {
@@ -75,6 +84,7 @@ export default function Login() {
 			encType: "application/json",
 			action: "/login",
 		});
+		reset();
 	}
 
 	return (
@@ -85,8 +95,11 @@ export default function Login() {
 					<p className="text-sm text-gray-500 mb-2">
 						{userCreated
 							? "Enter your username and password to continue."
-							: "This is a first time login. Set username and password."}
+							: "This is a first-time login. Set username and password."}
 					</p>
+					{actionData?.detail && (
+						<p className="text-sm text-rose-500 mb-2">{actionData.detail}</p>
+					)}
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
 						<Input
 							placeholder="username"
@@ -94,12 +107,30 @@ export default function Login() {
 							{...register("username", { required: true })}
 						/>
 
-						<Input
-							type={userCreated ? "password" : "text"}
-							placeholder="password"
-							className="font-mono"
-							{...register("password", { required: true, minLength: 8 })}
-						/>
+						<div className="relative">
+							<Input
+								type={userCreated ? "password" : "text"}
+								placeholder="password"
+								className="font-mono pr-8"
+								{...register("password", {
+									required: "Password is required",
+									minLength: {
+										value: 8,
+										message: "Password must be at least 8 characters",
+									},
+								})}
+							/>
+							{!userCreated && (
+								<span
+									className={`
+								absolute right-2 top-1/2 -translate-y-1/2
+								w-2 h-2 rounded-full
+								${$password >= 8 ? "bg-green-500" : "dark:bg-neutral-700 bg-neutral-400"}
+							`}
+									aria-hidden="true"
+								/>
+							)}
+						</div>
 
 						<Button type="submit">
 							<div className="i-lucide-corner-down-left" />

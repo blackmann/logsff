@@ -6,29 +6,22 @@ import React from "react";
 import { useFetcher } from "react-router-dom";
 import { usePaginatedResults } from "~/lib/use-paginated-results";
 import { LoadingButton } from "./loading-button";
+import type { FilterForm } from "~/lib/request-filter";
+import { fetchLogs } from "~/lib/get-logs";
 
-async function fetchRequestLogs(appId: string, prevResults: RequestLog[][]) {
-	const lastTimestamp = prevResults.at(-1)?.at(-1)?.timestamp;
-	const lastTime = lastTimestamp
-		? new Date(lastTimestamp).getTime()
-		: Date.now();
-
-	const res = await fetch(
-		`/logs?type=request&timestamp__lt=${lastTime}&appId=${appId}`,
-	);
-	const { logs } = await res.json();
-
-	return logs as RequestLog[];
+interface RequestLogsTableProps {
+	filters: FilterForm;
 }
 
-export function RequestLogsTable() {
+export function RequestLogsTable({ filters }: RequestLogsTableProps) {
 	const { app } = useParams();
 
 	const [selectedLog, setSelectedLog] = React.useState<RequestLog | null>(null);
 
 	const fn = React.useCallback(
-		(prevResults: RequestLog[][]) => fetchRequestLogs(app!, prevResults),
-		[app],
+		(prevResults: RequestLog[][]) =>
+			fetchLogs({ type: "request", appId: app!, prevResults, filters }),
+		[app, filters],
 	);
 
 	const { results, next, isLoading } = usePaginatedResults(fn);
@@ -37,13 +30,7 @@ export function RequestLogsTable() {
 	const done = results.at(-1)?.length === 0;
 
 	function select(log: RequestLog) {
-		setSelectedLog((prev) => {
-			if (prev?.id === log.id) {
-				return null;
-			}
-
-			return log;
-		});
+		setSelectedLog((prev) => (prev?.id === log.id ? null : log));
 	}
 
 	return (
