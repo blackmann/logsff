@@ -28,9 +28,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 	const { lastApp } = await getLastAppRedirect(request);
 
-	let currentApp: string | undefined;
+	let currentAppCookie: string | undefined;
 	if (lastApp?.app !== params.app) {
-		currentApp = await lastAppCookie.serialize({ app: params.app });
+		currentAppCookie = await lastAppCookie.serialize({ app: params.app });
 	}
 
 	const url = new URL(request.url);
@@ -56,10 +56,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 	return json(
 		{ app, timeseries, summary, worktime, opts },
-		currentApp
+		currentAppCookie
 			? {
 					headers: {
-						"Set-Cookie": currentApp,
+						"Set-Cookie": currentAppCookie,
 					},
 				}
 			: undefined,

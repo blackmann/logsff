@@ -10,8 +10,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "~/components/button";
 import { Input } from "~/components/input";
 import { checkAuth } from "~/lib/check-auth";
-import { authCookie, lastAppCookie } from "~/lib/cookies.server";
-import { getLastAppRedirect } from "~/lib/get-last-app";
+import { authCookie } from "~/lib/cookies.server";
 import { prisma } from "~/lib/prisma.server";
 import { badRequest } from "~/lib/responses";
 
@@ -19,8 +18,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	try {
 		await checkAuth(request);
 
-		const { redirectTo } = await getLastAppRedirect(request);
-		return redirect(redirectTo);
+		return redirect("/");
 	} catch (_) {
 		const userCreated = await prisma.user.count();
 
@@ -61,9 +59,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		return badRequest({ detail: "Incorrect username or password" });
 	}
 
-	const { redirectTo } = await getLastAppRedirect(request);
-
-	return redirect(redirectTo, {
+	return redirect("/", {
 		headers: {
 			"Set-Cookie": await authCookie.serialize({ userId: user.id }),
 		},
