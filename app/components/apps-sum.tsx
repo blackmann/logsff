@@ -47,7 +47,7 @@ export function AppsSum() {
 			<div className="col-span-1">
 				<div className="p-3">
 					<div className="flex">
-						<div className="text-sm text-orange-500 bg-orange-200/30 dark:bg-orange-600/10 rounded-lg px-2">
+						<div className="text-orange-500 bg-orange-200/30 dark:bg-orange-600/10 rounded-lg px-2">
 							Error Rate
 						</div>
 					</div>

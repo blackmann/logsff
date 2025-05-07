@@ -19,9 +19,19 @@ async function fetchLogs<T extends "request" | "app">({
 	type,
 }: FetchOpts & { type: T }): Promise<LogType<T>> {
 	const lastTimestamp = prevResults.at(-1)?.at(-1)?.timestamp;
-	const lastTime = lastTimestamp
-		? new Date(lastTimestamp).getTime()
-		: Date.now();
+	let lastTime: number;
+
+	if (lastTimestamp) {
+		lastTime = new Date(lastTimestamp).getTime();
+	} else {
+		const maxDate = filters.maxDate || new Date();
+		const durationMs =
+			filters.timeRange === "48h"
+				? 48 * 60 * 60 * 1000
+				: 45 * 24 * 60 * 60 * 1000;
+
+		lastTime = new Date(maxDate.getTime() + durationMs).getTime();
+	}
 
 	const params = new URLSearchParams({
 		type,
@@ -31,6 +41,7 @@ async function fetchLogs<T extends "request" | "app">({
 		timeRange: filters.timeRange,
 		...(filters.maxDate ? { maxDate: filters.maxDate.toISOString() } : {}),
 	});
+
 
 	const res = await fetch(`/logs?${params}`);
 	const { logs } = await res.json();
