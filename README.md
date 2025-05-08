@@ -1,5 +1,7 @@
 # logsff
 
+<p align="center"><img src="public/assets/sc-dashboard.png" style="border-radius: 1rem" width="500"/></p>
+
 This is a simple to use, simple to deploy observability for backend applications. You can simply deploy this application with vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fblackmann%2Flogsff&env=DATABASE_URL,COOKIE_SECRET,APP_TOKEN&envDescription=See%20link%20for%20details%20on%20env%20variables&envLink=https%3A%2F%2Fgithub.com%2Fblackmann%2Flogff%3Ftab%3Dreadme-ov-file%23env-variables)
