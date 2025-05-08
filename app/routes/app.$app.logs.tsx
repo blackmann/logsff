@@ -86,7 +86,7 @@ export default function Logs() {
 		<>
 			<AppsSum />
 			<AppGraph />
-			<Filter onFilterChange={handleFilterChange} searchParams={searchParams} />
+			<Filter onFilterChange={handleFilterChange} />
 			<AppLogsTable filters={filters} />
 		</>
 	);

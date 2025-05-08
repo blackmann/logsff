@@ -29,7 +29,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const { lastApp } = await getLastAppRedirect(request);
 
 	let currentAppCookie: string | undefined;
-	if (lastApp?.app !== params.app) {
+	if (lastApp !== params.app) {
 		currentAppCookie = await lastAppCookie.serialize({ app: params.app });
 	}
 
@@ -106,7 +106,7 @@ export default function Requests() {
 		<>
 			<RequestsSum />
 			<RequestsGraph />
-			<Filter onFilterChange={handleFilterChange} searchParams={searchParams} />
+			<Filter onFilterChange={handleFilterChange} />
 			<RequestLogsTable filters={filters} />
 		</>
 	);
