@@ -10,6 +10,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		const user = await checkAuth(request);
 		const apps = await prisma.app.findMany();
 
+		const url = new URL(request.url);
+		const path = url.pathname.replace(/\/$/, "");
+
+		if (path === "/app" && apps.length > 0) {
+			return redirect(`/app/${apps[0].slug}/requests`);
+		}
+
 		return { apps, user };
 	} catch (error) {
 		return redirect("/login");

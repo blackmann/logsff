@@ -5,6 +5,7 @@ import {
 } from "@remix-run/node";
 import { checkAuth } from "~/lib/check-auth";
 import { getLastAppRedirect } from "~/lib/get-last-app";
+import { prisma } from "~/lib/prisma.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	try {
@@ -13,9 +14,21 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		return redirect("/login");
 	}
 
-	const { redirectTo } = await getLastAppRedirect(request);
+	const { redirectTo, lastApp } = await getLastAppRedirect(request);
 
-	return redirect(redirectTo);
+	if (lastApp) {
+		const app = await prisma.app.findUnique({
+			where: { slug: lastApp },
+		});
+
+		if (app) {
+			return redirect(redirectTo);
+		}
+	}
+
+	const apps = await prisma.app.findMany();
+
+	return redirect(apps.length ? `/app/${apps[0].slug}/requests` : "/app");
 };
 
 export const meta: MetaFunction = () => {

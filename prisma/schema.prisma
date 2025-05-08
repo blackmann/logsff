@@ -25,7 +25,7 @@ model App {
 model RequestLog {
   id        Int      @id @default(autoincrement())
   appId     String
-  app       App      @relation(fields: [appId], references: [slug])
+  app       App      @relation(fields: [appId], references: [slug], onDelete: Cascade)
   status    Int
   method    String
   path      String
@@ -38,7 +38,7 @@ model RequestLog {
 model AppLog {
   id        Int         @id @default(autoincrement())
   appId     String
-  app       App         @relation(fields: [appId], references: [slug])
+  app       App         @relation(fields: [appId], references: [slug], onDelete: Cascade)
   message   String
   level     AppLogLevel
   duration  Int?

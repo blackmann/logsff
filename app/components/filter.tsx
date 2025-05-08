@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import React from "react";
 import { Input } from "./input";
 import { Select } from "./select";
+import { useSearchParams } from "react-router-dom";
 
 interface FilterForm {
 	query: string;
@@ -12,10 +13,11 @@ interface FilterForm {
 
 interface FilterProps {
 	onFilterChange: (filters: FilterForm) => void;
-	searchParams: URLSearchParams;
 }
 
-export function Filter({ onFilterChange, searchParams }: FilterProps) {
+export function Filter({ onFilterChange }: FilterProps) {
+	const [searchParams] = useSearchParams();
+
 	const defaultMaxDate = startOfDay(
 		new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
 	);

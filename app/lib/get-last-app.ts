@@ -1,10 +1,10 @@
 import { lastAppCookie } from "./cookies.server";
 
 export async function getLastAppRedirect(request: Request) {
-	const cookieHeader = request.headers.get("Cookie");
-	const lastApp = await lastAppCookie.parse(cookieHeader);
+	const { app } =
+		(await lastAppCookie.parse(request.headers.get("Cookie"))) || {};
 
-	const redirectTo = lastApp?.app ? `/app/${lastApp.app}/requests` : "/app/";
+	const redirectTo = app && `/app/${app}/requests`;
 
-	return { redirectTo, lastApp };
+	return { redirectTo, lastApp: app };
 }
