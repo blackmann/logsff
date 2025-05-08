@@ -21,7 +21,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 		const slug = params.app;
 		await prisma.app.delete({ where: { slug } });
 
-		return redirect("/app");
+		return redirect("/");
 	}
 
 	return null;
