@@ -4,10 +4,10 @@ import clsx from "clsx";
 import { format, formatDate } from "date-fns";
 import React from "react";
 import { useFetcher } from "react-router-dom";
+import { fetchLogs } from "~/lib/get-logs";
+import type { FilterForm } from "~/lib/request-filter";
 import { usePaginatedResults } from "~/lib/use-paginated-results";
 import { LoadingButton } from "./loading-button";
-import type { FilterForm } from "~/lib/request-filter";
-import { fetchLogs } from "~/lib/get-logs";
 
 interface RequestLogsTableProps {
 	filters: FilterForm;
@@ -213,7 +213,9 @@ function MetaTable({ meta }: { meta: any }) {
 					>
 						<div className="font-mono text-secondary">{key}</div>
 						<div className="font-mono text-wrap break-all whitespace-pre-wrap">
-							{JSON.stringify(value, null, 2)}
+							{typeof value === "string"
+								? value
+								: JSON.stringify(value, null, 2)}
 						</div>
 					</div>
 				))}
