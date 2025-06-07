@@ -16,7 +16,7 @@ export function NavHeader() {
 
 	return (
 		<header className="p-2 border-b dark:border-neutral-700">
-			<div className="flex justify-between items-center">
+			<div className="flex flex-col xl:flex-row space-2 justify-between items-center">
 				<div className="flex items-center gap-2 font-bold text-violet-500 font-mono">
 					<div className="text-xl bg-violet-500/10 rounded-lg p-1">
 						<div className="i-lucide-container" />
@@ -27,7 +27,7 @@ export function NavHeader() {
 				{appId && (
 					<div
 						className={clsx(
-							"flex text-sm font-mono border rounded-lg divide-x dark:(border-neutral-700 divide-neutral-700) overflow-hidden",
+							"flex text-sm font-mono border-2 rounded-3xl divide-x dark:(border-neutral-700 divide-neutral-700) overflow-hidden",
 							{
 								"!border-blue-500/70": isLogs && appId,
 								"!border-rose-500/70": isRequests && appId,
@@ -35,16 +35,16 @@ export function NavHeader() {
 						)}
 					>
 						<Link
-							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-2 py-1", {
-								"!bg-rose-500 text-white": isRequests,
+							className={clsx("bg-zinc-100 dark:bg-neutral-800 hover:bg-neutral-900 transition-colors px-3 py-1.5", {
+								"!bg-rose-500/70 text-white": isRequests,
 							})}
 							to={`/app/${appId}/requests`}
 						>
 							Requests
 						</Link>
 						<Link
-							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-2 py-1", {
-								"!bg-blue-500 text-white": isLogs,
+							className={clsx("bg-zinc-100 dark:bg-neutral-800 hover:bg-neutral-900 transition-colors px-3 py-1.5", {
+								"!bg-blue-500/70 text-white": isLogs,
 							})}
 							to={`/app/${appId}/logs`}
 						>

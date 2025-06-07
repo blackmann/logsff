@@ -8,9 +8,9 @@ import {
 } from "unocss";
 
 export default defineConfig({
-	content: {
-		filesystem: ["**/*.{html,js,ts,jsx,tsx,vue,svelte,astro}"],
-	},
-	presets: [presetWind3({ dark: "media" }), presetIcons(), presetForms()],
-	transformers: [transformerDirectives(), transformerVariantGroup()],
+  content: {
+    filesystem: ["app/**/*.{html,js,ts,tsx}"],
+  },
+  presets: [presetWind3({ dark: "media" }), presetIcons(), presetForms()],
+  transformers: [transformerDirectives(), transformerVariantGroup()],
 });
