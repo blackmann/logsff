@@ -27,7 +27,7 @@ export function NavHeader() {
 				{appId && (
 					<div
 						className={clsx(
-							"flex text-sm font-mono border rounded-3xl divide-x dark:(border-neutral-700 divide-neutral-700) overflow-hidden",
+							"flex text-sm font-mono border rounded-lg divide-x dark:(border-neutral-700 divide-neutral-700) overflow-hidden",
 							{
 								"!border-blue-500": isLogs && appId,
 								"!border-rose-500": isRequests && appId,
@@ -35,7 +35,7 @@ export function NavHeader() {
 						)}
 					>
 						<Link
-							className={clsx("bg-zinc-100 dark:bg-neutral-800 hover:bg-neutral-900 transition-colors px-3 py-1.5", {
+							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-3 py-1.5", {
 								"!bg-rose-500 text-white": isRequests,
 							})}
 							to={`/app/${appId}/requests`}
@@ -43,7 +43,7 @@ export function NavHeader() {
 							Requests
 						</Link>
 						<Link
-							className={clsx("bg-zinc-100 dark:bg-neutral-800 hover:bg-neutral-900 transition-colors px-3 py-1.5", {
+							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-3 py-1.5", {
 								"!bg-blue-500 text-white": isLogs,
 							})}
 							to={`/app/${appId}/logs`}
