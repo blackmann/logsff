@@ -35,7 +35,7 @@ export function NavHeader() {
 						)}
 					>
 						<Link
-							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-3 py-1", {
+							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-2 py-1", {
 								"!bg-rose-500 text-white": isRequests,
 							})}
 							to={`/app/${appId}/requests`}
@@ -43,7 +43,7 @@ export function NavHeader() {
 							Requests
 						</Link>
 						<Link
-							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-3 py-1", {
+							className={clsx("bg-zinc-100 dark:bg-neutral-800 px-2 py-1", {
 								"!bg-blue-500 text-white": isLogs,
 							})}
 							to={`/app/${appId}/logs`}
