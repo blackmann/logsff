@@ -16,7 +16,7 @@ export function NavHeader() {
 
 	return (
 		<header className="p-2 border-b dark:border-neutral-700">
-			<div className="flex max-xl:flex-col gap-2 justify-between items-center">
+			<div className="flex gap-2 justify-between items-center">
 				<div className="flex items-center gap-2 font-bold text-violet-500 font-mono">
 					<div className="text-xl bg-violet-500/10 rounded-lg p-1">
 						<div className="i-lucide-container" />

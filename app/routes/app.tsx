@@ -33,7 +33,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function AppLayout() {
 	return (
 		<div className="flex h-screen">
-			<div className="w-78 h-screen border-e bg-zinc-50 dark:(bg-neutral-900 border-neutral-700) flex flex-col">
+			<div className="min-w-78 w-78 h-screen border-e bg-zinc-50 dark:(bg-neutral-900 border-neutral-700) flex flex-col">
 				<NavHeader />
 				<AppsList />
 			</div>
