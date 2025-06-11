@@ -16,7 +16,7 @@ export function NavHeader() {
 
 	return (
 		<header className="p-2 border-b dark:border-neutral-700">
-			<div className="flex justify-between items-center">
+			<div className="flex gap-2 justify-between items-center">
 				<div className="flex items-center gap-2 font-bold text-violet-500 font-mono">
 					<div className="text-xl bg-violet-500/10 rounded-lg p-1">
 						<div className="i-lucide-container" />
@@ -29,8 +29,8 @@ export function NavHeader() {
 						className={clsx(
 							"flex text-sm font-mono border rounded-lg divide-x dark:(border-neutral-700 divide-neutral-700) overflow-hidden",
 							{
-								"!border-blue-500/70": isLogs && appId,
-								"!border-rose-500/70": isRequests && appId,
+								"!border-blue-500": isLogs && appId,
+								"!border-rose-500": isRequests && appId,
 							},
 						)}
 					>

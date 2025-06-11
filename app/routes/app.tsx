@@ -32,12 +32,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function AppLayout() {
 	return (
-		<div className="grid grid-cols-5 h-screen">
-			<div className="col-span-1 h-screen border-e bg-zinc-50 dark:(bg-neutral-900 border-neutral-700) flex flex-col">
+		<div className="flex h-screen">
+			<div className="min-w-78 w-78 h-screen border-e bg-zinc-50 dark:(bg-neutral-900 border-neutral-700) flex flex-col">
 				<NavHeader />
 				<AppsList />
 			</div>
-			<div className="col-span-4 h-screen dark:bg-neutral-800">
+			<div className="flex-1 h-screen dark:bg-neutral-800">
 				<div className="flex flex-col h-full">
 					<Outlet />
 				</div>
