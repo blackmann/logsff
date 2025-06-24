@@ -4,6 +4,7 @@ import React from "react";
 import { Input } from "./input";
 import { Select } from "./select";
 import { useSearchParams } from "react-router-dom";
+import { Button } from "./button";
 
 interface FilterForm {
 	query: string;
@@ -52,39 +53,47 @@ export function Filter({ onFilterChange }: FilterProps) {
 	}, [watch, onFilterChange]);
 
 	return (
-		<div className="flex gap-2 items-center border-t px-2 py-4 dark:border-neutral-700">
-			<Input
-				className="font-mono py-2"
-				placeholder="{ }"
-				{...register("query")}
-			/>
-			<div className="flex items-center border rounded-lg divide-x dark:border-neutral-700">
-				<Select
-					className="py-2 rounded-e-0 border-0 font-mono !w-6rem"
-					{...register("timeRange")}
-				>
-					<option value="45d">45d</option>
-					<option value="48h">48h</option>
-				</Select>
+    <div className="flex gap-2 items-center border-t px-2 py-4 dark:border-neutral-700">
+      <Button
+        className="font-mono py-2 min-w-max"
+        onClick={() =>
+          onFilterChange({ query: "", timeRange: "48h", maxDate: undefined })
+        }
+      >
+        Load recent logs
+      </Button>
+      <Input
+        className="font-mono py-2"
+        placeholder="{ }"
+        {...register("query")}
+      />
+      <div className="flex items-center border rounded-lg divide-x dark:border-neutral-700">
+        <Select
+          className="py-2 rounded-e-0 border-0 font-mono !w-6rem"
+          {...register("timeRange")}
+        >
+          <option value="45d">45d</option>
+          <option value="48h">48h</option>
+        </Select>
 
-				<Controller
-					control={control}
-					name="maxDate"
-					render={({ field: { value, onChange, ...fieldProps } }) => (
-						<Input
-							type="date"
-							className="py-2 rounded-s-0 border-0 font-mono"
-							max={format(defaultMaxDate, "yyyy-MM-dd")}
-							value={value ? format(value, "yyyy-MM-dd") : ""}
-							onChange={(e) => {
-								const val = e.target.value;
-								onChange(val ? parse(val, "yyyy-MM-dd", new Date()) : null);
-							}}
-							{...fieldProps}
-						/>
-					)}
-				/>
-			</div>
-		</div>
-	);
+        <Controller
+          control={control}
+          name="maxDate"
+          render={({ field: { value, onChange, ...fieldProps } }) => (
+            <Input
+              type="date"
+              className="py-2 rounded-s-0 border-0 font-mono"
+              max={format(defaultMaxDate, "yyyy-MM-dd")}
+              value={value ? format(value, "yyyy-MM-dd") : ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                onChange(val ? parse(val, "yyyy-MM-dd", new Date()) : null);
+              }}
+              {...fieldProps}
+            />
+          )}
+        />
+      </div>
+    </div>
+  );
 }
